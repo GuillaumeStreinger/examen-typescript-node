@@ -5,9 +5,10 @@ interface Person {
   heigth:number;
 }
 
-function getStatistics():Person[] {
+function getStatistics(): number {
   const persons: Person[] = JSON.parse(readFileSync("./persons.json").toString());
-  return persons;
+  const maxAge = persons.reduce((max, person) => person.age > max ? person.age : max, 0);
+  return maxAge;
 }
 
 function displayResult() {
