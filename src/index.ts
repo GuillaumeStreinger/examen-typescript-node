@@ -1,7 +1,8 @@
 import { readFileSync } from "fs";
+
 interface Person {
-  age: number | string | null;
-  height: number | string | null;
+  age: number;
+  height: number;
 }
 
 interface Statistics {
@@ -9,24 +10,25 @@ interface Statistics {
   meanHeight: number;
 }
 
-function getStatistics(): Statistics {
+function getStatistics(): Statistics | null {
   const persons: Person[] = JSON.parse(readFileSync("./persons.json").toString());
 
-  // Filtrer les personnes avec des âges et des tailles valides, puis calculer les totaux
-  const validPersons = persons.filter(person => 
-    typeof person.age === 'number' && person.age > 0 && 
-    typeof person.height === 'number' && person.height > 0
-  );
+  // Vérifier si le tableau est vide ou si le premier élément ne possède pas les propriétés 'age' et 'height'
+  if (persons.length === 0 || persons[0].age === undefined || persons[0].height === undefined) {
+    console.error("Erreur : Les données du fichier persons.json ne sont pas correctement formées.");
+    return null; // Retourne null pour indiquer une erreur
+  }
 
-  const totals = validPersons.reduce((acc, person) => {
-    acc.totalAge += person.age as number;
-    acc.totalHeight += person.height as number;
+  // Calcul de la somme totale des âges et des tailles
+  const totals = persons.reduce((acc, person) => {
+    acc.totalAge += person.age;
+    acc.totalHeight += person.height;
     return acc;
   }, { totalAge: 0, totalHeight: 0 });
 
   // Calcul de l'âge moyen et de la taille moyenne
-  const meanAge = validPersons.length > 0 ? totals.totalAge / validPersons.length : 0;
-  const meanHeight = validPersons.length > 0 ? totals.totalHeight / validPersons.length : 0;
+  const meanAge = totals.totalAge / persons.length;
+  const meanHeight = totals.totalHeight / persons.length;
 
   // Retour d'un objet avec l'âge moyen et la taille moyenne
   return { meanAge, meanHeight };
@@ -34,7 +36,11 @@ function getStatistics(): Statistics {
 
 function displayResult() {
   const stats = getStatistics();
-  console.log(`Moyenne d'âge : ${stats.meanAge.toFixed(2)}, Moyenne de taille : ${stats.meanHeight.toFixed(2)} cm`);
+  if (stats) {
+    console.log(`Moyenne d'âge : ${stats.meanAge.toFixed(2)}, Moyenne de taille : ${stats.meanHeight.toFixed(2)} cm`);
+  } else {
+    console.log("Impossible d'afficher les résultats en raison d'une erreur dans les données.");
+  }
 }
 
 displayResult();
