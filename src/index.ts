@@ -1,8 +1,13 @@
 import { readFileSync } from "fs";
 
-function getStatistics():number {
-  const persons = JSON.parse(readFileSync("./persons.json").toString());
-  return persons
+interface Person {
+  age:number;
+  heigth:number;
+}
+
+function getStatistics():Person[] {
+  const persons: Person[] = JSON.parse(readFileSync("./persons.json").toString());
+  return persons;
 }
 
 function displayResult() {
