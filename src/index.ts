@@ -12,14 +12,25 @@ interface Statistics {
 
 function getStatistics(): Statistics {
   const persons: Person[] = JSON.parse(readFileSync("./persons.json").toString());
-  const totalAge = persons.reduce((sum, person) => sum + person.age, 0);
-  const meanAge = totalAge / persons.length;
-  const totalHeight = persons.reduce((sum, person) => sum + person.height, 0);
-  const meanHeight = totalHeight / persons.length;
+
+  // Calcul de la somme totale des âges et des tailles
+  const totals = persons.reduce((acc, person) => {
+    acc.totalAge += person.age;
+    acc.totalHeight += person.height;
+    return acc;
+  }, { totalAge: 0, totalHeight: 0 });
+
+  // Calcul de l'âge moyen et de la taille moyenne
+  const meanAge = totals.totalAge / persons.length;
+  const meanHeight = totals.totalHeight / persons.length;
+
+  // Retour d'un objet avec l'âge moyen et la taille moyenne
   return { meanAge, meanHeight };
 }
 
 function displayResult() {
-  console.log(getStatistics());
+  const stats = getStatistics();
+  console.log(`Moyenne d'âge : ${stats.meanAge.toFixed(2)}, Moyenne de taille : ${stats.meanHeight.toFixed(2)} cm`);
 }
+
 displayResult();
